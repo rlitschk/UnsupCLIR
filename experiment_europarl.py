@@ -1,4 +1,5 @@
 import numpy as np
+import constants as c
 from itertools import compress
 from embeddings import Embeddings
 from timer import Timer as PPrintTimer
@@ -7,13 +8,6 @@ from text2vec import clean
 from text2vec import create_text_representations
 from faiss_index import create_index
 from faiss_index import search
-
-
-PATH_BASE = "/home/gglavas/data/word_embs/fasttext/"  # "./Data/"
-PATH_EN = PATH_BASE + "wiki.en.mapped.vec"
-PATH_DE = PATH_BASE + "wiki.de.mapped.vec"
-PATH_MT_DE = "/home/rlitschk/CLIR/UnsupCLIR/Europarl.de-en.de"
-PATH_MT_EN = "/home/rlitschk/CLIR/UnsupCLIR/Europarl.de-en.en"
 
 
 def clean_mt_data(src, tar):
@@ -110,7 +104,7 @@ def run_experiment(src_lang, src_file, targ_lan, targ_file, eval_files,
     pass
 
 
-run_experiment('german', PATH_DE, 'english', PATH_EN, (PATH_MT_DE, PATH_MT_EN), normalize=False)
+run_experiment('german', c.PATH_EMB_DE, 'english', c.PATH_EMB_EN, (c.PATH_MT_DE, c.PATH_MT_EN), normalize=False)
 
 
 # def inspect_example(q_id, top_k, result_lists, distances):
