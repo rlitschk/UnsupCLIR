@@ -61,10 +61,10 @@ Expected directory sturcture:
 Reference to cite when you use UnsupCLIR in a research paper:
 
 ```
-@article{LGPV18,
+@inproceedings{LGPV18,
   title={Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only},
   author={Litschko, Robert and Glava\v{s}, Goran and Ponzetto, Simone Paolo and Vuli\'c, Ivan},
-  journal={tba},
-  year={2018}
+  booktitle={Proceedings of SIGIR},
+  year={2018},
 }
 ```
