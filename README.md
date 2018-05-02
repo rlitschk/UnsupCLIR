@@ -9,7 +9,7 @@ This project is the codebase for our paper "*Unsupervised Cross-Lingual Informat
 In order to get started follow these steps:
 * Get the official CLEF evaluation data from http://catalog.elra.info/product_info.php?products_id=888
     * Copy the data into the project folder to match the directory structure shown below (subfolder structure in /HOME/Data/)
-* Download the embeddings from [link] and paste them into /HOME/Embeddings. Alternatively, you can also train your own shared embedding spaces.
+* Download the embeddings from https://madata.bib.uni-mannheim.de/273/ and paste them into /HOME/Embeddings. Alternatively, you can also train your own shared embedding spaces.
 	* Smith: https://github.com/Babylonpartners/fastText_multilingual
 	* Conneau: https://github.com/facebookresearch/MUSE
 * Set the HOME variable in constants<i></i>.py to point to the directory in which your project resides
@@ -25,7 +25,6 @@ Expected directory sturcture:
     │       ├── DocumentData
     │       │   ├── dutch
     │       │   │   ├── algemeen_dagblad
-    │       │   │   ├── all
     │       │   │   └── nrc_handelsblad
     │       │   ├── finnish
     │       │   │   └── aamu

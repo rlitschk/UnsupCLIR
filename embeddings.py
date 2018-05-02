@@ -1,17 +1,16 @@
 import numpy as np
+from constants import EMBEDDING_DIM
 from multiprocessing import Pool
 
 
 class Embeddings(object):
     """Captures functionality to load and store textual embeddings"""
 
-    def __init__(self, cache_similarities=False):
+    def __init__(self):
         self.lang_embeddings = {}
         self.lang_emb_norms = {}
         self.lang_vocabularies = {}
         self.emb_sizes = {}
-        self.cache = {}
-        self.do_cache = cache_similarities
 
     def get_vector(self, lang, word):
         if word in self.lang_vocabularies[lang]:
@@ -41,7 +40,7 @@ class Embeddings(object):
         emb = pool.map(_load_embedding, lines)  # entry[0] = word, entry[1] = vector, entry[2] = norm
         pool.close()
         pool.join()
-        emb = [entry for entry in emb if entry[1] is not None and entry[1].shape[0] == 300]  # cleaning
+        emb = [entry for entry in emb if entry[1] is not None and entry[1].shape[0] == EMBEDDING_DIM]  # cleaning
 
         self.add_language(language)
         index_correction = 0
@@ -75,8 +74,8 @@ class Embeddings(object):
 def _load_embedding(line):
     if line != "\n":
         splt = line.split()
-        word = splt[0]
-        embedding = np.array(splt[1:], dtype=np.float32)
+        word = ''.join(splt[:-EMBEDDING_DIM])
+        embedding = np.array(splt[-EMBEDDING_DIM:], dtype=np.float32)
         norm = np.linalg.norm(embedding, 2)
         return word, embedding, norm
     else:

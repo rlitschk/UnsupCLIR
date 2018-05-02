@@ -1,6 +1,7 @@
 # Please specify project home dir, e.g. "/home/username/UnsupCLIR/"
 HOME = ""
-PROCESS_COUNT = 60
+PROCESS_COUNT = 50
+EMBEDDING_DIM = 300
 
 # Paths required for
 PATH_EMB_BASE = HOME + "Embeddings/"

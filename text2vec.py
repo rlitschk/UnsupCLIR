@@ -107,11 +107,11 @@ def text2vec_bigram(text, language='', dim=300):
             emb_2 = zero_vec
         bigram_vectors.append(np.tanh(emb_1 + emb_2))
 
-    document_vector = np.sum(bigram_vectors , 0) if len(bigram_vectors) > 0 else zero_vec
+    document_vector = np.sum(bigram_vectors, 0) if len(bigram_vectors) > 0 else zero_vec
     if not np.array_equal(document_vector, zero_vec):
         try:
                 document_vector /= np.linalg.norm(document_vector, 2)
-        except Exception as e:
+        except Exception as e:  # TODO: fix broad exception
             document_vector = zero_vec
     return document_vector, [], [], 0
 
@@ -144,14 +144,14 @@ def text2vec_sum(text, language='', dim=300):
     word_vectors = []
     zero_vec = np.zeros(dim)
 
-    _all=0
-    _unique=set()
+    _all = 0
+    _unique = set()
     for token in tokenize(text, language=language):
-        _all+=1
+        _all += 1
         _unique.add(token)
 
         _, word_vector = lookup(token, language)
-        if word_vector is None: #tv-wereld, oost-duitsland (split and lookup each token)
+        if word_vector is None:  # tv-wereld, oost-duitsland (split and lookup each token)
             word_vector = zero_vec
             if not any(t.isdigit() for t in token):
                 unknown_words.append(token)
@@ -236,14 +236,14 @@ def create_text_representations(language, id_text, emb, method = text2vec_sum, p
         for key in embeddings.lang_vocabularies[language].keys():
             try:
                 idf = idf_weights[key]
-                old_embedding = embeddings.get_vector(lang=language,word=key)
+                old_embedding = embeddings.get_vector(lang=language, word=key)
                 rescaled_embedding = old_embedding * idf
-                embeddings.set_vector(lang=language,word=key,vector=rescaled_embedding)
+                embeddings.set_vector(lang=language, word=key, vector=rescaled_embedding)
             except:
                 pass
         print("old weights idf-rescaled")
 
-    pool = Pool(processes = processes)
+    pool = Pool(processes=processes)
     partial_method = partial(method, language=language)
     results = pool.map(partial_method, id_text)
     pool.close()

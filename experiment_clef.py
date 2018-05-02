@@ -246,7 +246,6 @@ def run_unigram_lm(query_lang, doc_lang, experiment_data, processes=40, most_com
             scores_for_query = pool.map(_score_doc_unigram_lm, zip(doc_subset_distributions,  # {word_d: freq}
                                                                    repeat(query),  # {word_q: freq}
                                                                    repeat(col_subset_distribution),
-                                                                   # collection_dist_subsets,
                                                                    broadcasted_collection_size))  # {word_dc: freq}
             # condition for random ranking if all documents score zero
             any_score_non_zero = sum(scores_for_query) > 0
@@ -258,7 +257,8 @@ def run_unigram_lm(query_lang, doc_lang, experiment_data, processes=40, most_com
         else:
             results.append(random_ranking)  # query without relevant documents is not fired
             suffix = " --> no relevant docs for q_id %s" % str(query_id)
-        print("%s  queries processed (%s) %s" % (i, timer.pprint_lap(), suffix))
+        if i % 10 == 0:
+            print("%s  queries processed (%s) %s" % (i, timer.pprint_lap(), suffix))
 
     pool.close()
     pool.join()
@@ -286,7 +286,7 @@ def run_wordbyword_translation(query_lang, doc_lang, experiment_data, initialize
 
     index, quantizer = create_index(doc_language_embeddings)
     search_vecs = []
-    zero_vec = np.zeros(300, dtype=np.float32)
+    zero_vec = np.zeros(c.EMBEDDING_DIM, dtype=np.float32)
     keep_words_as_is = set()
     for unique_query_term in unique_query_terms:
         lookedup_word, vec = lookup(unique_query_term, qlang_long, embedding_lookup=embeddings)
@@ -410,7 +410,7 @@ def main():
     process_count = c.PROCESS_COUNT  # number of cores
     query_limit = None  # limit for testing/debugging,e.g. 10
     doc_limit = None  # limit for testing/debugging, e.g. 100
-    emb_limit = 100000  # 100,000 is value used in paper
+    emb_limit = 100000
     most_frequent_vocab = None
 
     # Prepare dutch CLEF data
