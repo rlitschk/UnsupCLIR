@@ -1,8 +1,9 @@
 
 # Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only 
 
-This project is the codebase for our paper "*Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only*" (UnsupCLIR) published at [SIGIR'18](http://sigir.org/sigir2018/). We propose a fully unsupervised framework for ad-hoc cross-lingual information retrieval (CLIR) which requires no bilingual data at all. Our experiments use the standard CLEF CLIR collections and outperform baselines that utilize cross-lingual embeddings relying on word- and document-level alignments.
+This project is the codebase for our paper "*Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only*" (UnsupCLIR) accepted at [SIGIR'18](http://sigir.org/sigir2018/). We propose a fully unsupervised framework for ad-hoc cross-lingual information retrieval (CLIR) which requires no bilingual data at all. Our experiments use the standard CLEF CLIR collections and outperform baselines that utilize cross-lingual embeddings relying on word- and document-level alignments.
 
+Preprint: https://arxiv.org/abs/1805.00879
 
 
 ## Getting Started
