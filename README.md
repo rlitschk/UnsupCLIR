@@ -1,74 +1,42 @@
+# Cross-Lingual Information Retrieval with Cross-Lingual Word Embeddings 
 
-# Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only 
-
-This project is the codebase for our paper "*Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only*" (UnsupCLIR) accepted at [SIGIR'18](http://sigir.org/sigir2018/). We propose a fully unsupervised framework for ad-hoc cross-lingual information retrieval (CLIR) which requires no bilingual data at all. Our experiments use the standard CLEF CLIR collections and outperform baselines that utilize cross-lingual embeddings relying on word- and document-level alignments.
-
-Preprint: https://arxiv.org/abs/1805.00879
+This repository contains the source code to reproduce the results for our experiments, which we presented at SIGIR'18 and SIGIR'19. 
 
 
-## Getting Started
-In order to get started follow these steps:
-* Get the official CLEF evaluation data from http://catalog.elra.info/product_info.php?products_id=888
-    * Copy the data into the project folder to match the directory structure shown below (subfolder structure in /HOME/Data/)
-* Download the embeddings from https://madata.bib.uni-mannheim.de/273/ and paste them into /HOME/Embeddings. Alternatively, you can also train your own shared embedding spaces.
-	* Smith: https://github.com/Babylonpartners/fastText_multilingual
-	* Conneau: https://github.com/facebookresearch/MUSE
-* Set the HOME variable in constants<i></i>.py to point to the directory in which your project resides
-* Run experiments_clef.py for individual results
-* Run ensemble_clef.py to get ensemble results
+## Installation
 
-Expected directory sturcture:
+The following steps apply for both papers:
+* Create an anaconda environment with `conda create -n unsupclir python=3.7`
+* Install requirements: `pip install -r requirements.txt`
+* Set up [clef-dataloaders](https://github.com/rlitschk/clef-dataloaders): `pip install git+https://github.com/rlitschk/clef-dataloaders.git`
+* Download the CLEF 2000-2003 test collection from ELRA ([ELRA-E0008](https://catalogue.elra.info/en-us/repository/browse/ELRA-E0008/))
 
-```bash
-└── UnsupCLIR [HOME]
-    ├── Data
-    │   └── CLEF
-    │       ├── DocumentData
-    │       │   ├── dutch
-    │       │   │   ├── algemeen_dagblad
-    │       │   │   └── nrc_handelsblad
-    │       │   ├── finnish
-    │       │   │   └── aamu
-    │       │   └── italian
-    │       │       ├── la_stampa
-    │       │       ├── sda_italian_94
-    │       │       └── sda_italian_95
-    │       ├── RelAssess
-    │       │   ├── 2001
-    │       │   ├── 2002
-    │       │   └── 2003
-    │       └── Topics
-    │           ├── 2001
-    │           ├── 2002
-    │           └── 2003
-    ├── Embeddings
-    │   ├── Conneau
-    │   │   ├── enfi
-    │   │   ├── enit
-    │   │   └── ennl
-    │   ├── Smith
-    │   │   ├── enfi
-    │   │   ├── enit
-    │   │   └── ennl
-    │   └── Vulic
-    │       ├── enfi
-    │       ├── enit
-    │       ├── ennl
-    └── Results
+# Reproduce SIGIR 2018 Results 
+In our paper [Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only](https://arxiv.org/abs/1805.00879), we propose a fully unsupervised framework for ad-hoc cross-lingual information retrieval (CLIR) which requires no bilingual data at all. To reproduce our results, run `scripts/reproduce_sigir18.sh`. This will download cross-lingual word embeddings and run all experiments.
+
+Bibtex:
 ```
-
-## Reference
-
-Reference to cite when you use UnsupCLIR in a research paper:
-
-```
-@inproceedings{LGPV18,
-  title={Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only},
-  author={Litschko, Robert and Glava\v{s}, Goran and Ponzetto, Simone Paolo and Vuli\'c, Ivan},
-  booktitle={Proceedings of SIGIR},
-  year={2018},
+@inproceedings{litschko2018unsupervised,
+  title={Unsupervised cross-lingual information retrieval using monolingual data only},
+  author={Litschko, Robert and Glava{\v{s}}, Goran and Ponzetto, Simone Paolo and Vuli{\'c}, Ivan},
+  booktitle={The 41st International ACM SIGIR Conference on Research \& Development in Information Retrieval},
+  pages={1253--1256},
+  year={2018}
 }
 ```
 
-### Licence
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+# Reproduce SIGIR 2019 Results 
+
+In our paper [Evaluating Resource-Lean Cross-Lingual Embedding Models in Unsupervised Retrieval](https://dl.acm.org/doi/10.1145/3331184.3331324), we compare different CLWE spaces in CLIR. To reproduce the results, run `scripts/reproduce_sigir19_{clef,europarl}.sh`. 
+
+Bibtex: 
+
+```
+@inproceedings{litschko2019evaluating,
+  title={Evaluating resource-lean cross-lingual embedding models in unsupervised retrieval},
+  author={Litschko, Robert and Glava{\v{s}}, Goran and Vulic, Ivan and Dietz, Laura},
+  booktitle={Proceedings of the 42nd international ACM SIGIR conference on research and development in information retrieval},
+  pages={1109--1112},
+  year={2019}
+}
+```

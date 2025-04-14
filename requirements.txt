@@ -1,0 +1,6 @@
+numpy==1.21.6
+regex==2024.4.16
+faiss-cpu==1.7.4
+tqdm==4.66.4
+clef-dataloaders @ git+https://github.com/rlitschk/clef-dataloaders.git@29ca02bc740a43293e949856a60b83d3579c8ce1
+nltk==3.8.1

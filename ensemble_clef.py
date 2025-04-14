@@ -1,11 +1,34 @@
-from timer import Timer as PPrintTimer
-import numpy as np
+import os.path
+import argparse
+import tqdm
 import random
 import constants as c
-from multiprocessing import Pool
-from load_data import load_relevance_assessments
-from functools import partial
+import numpy as np
 
+from clef_dataloaders import load_relevance_assessments
+from timer import Timer as PPrintTimer
+from helper import print_summary
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--directory", type=str, required=True)
+parser.add_argument("--clwe", nargs="+", help=f"(optional) Choose one or more: {c.CLWEs}", choices=c.sigir18_CLWEs, required=False, default=c.sigir18_CLWEs)
+parser.add_argument("--years", nargs="+", choices=["2001", "2002", "2003"])
+parser.add_argument("--language_pairs", nargs="*", required=True)
+
+args = parser.parse_args()
+YEARS = args.years
+LANGUAGE_PAIRS = []
+for lp in args.language_pairs:
+    ql, dl = lp[:2], lp[2:]
+    if lp not in ["ennl", "enit", "enfi"]:
+        raise RuntimeError(f"sigir18 paper does not contain {lp} evaluation")
+    LANGUAGE_PAIRS.append((c.short2pair[ql], c.short2pair[dl]))
+CLWE = args.clwe
+DIR = args.directory
+
+
+random.seed(0)
 
 # year, language_pair, embeddingspace are fixed, methods are variable
 def run_ensemble(method_paths, relass, param_model_weights=None):
@@ -90,67 +113,53 @@ def run_ensemble(method_paths, relass, param_model_weights=None):
         log_str += ','.join([str(weight) for weight in model_weights])
     else:
         log_str += "all_equal"
-    return log_str, mean_average_precision
+    return mean_average_precision
 
 
 def main():
-    # template for specifying path to results files, e.g. 'PROJECT_HOME/Results/rankings_2001_enit_Conneau.txt'
-    file_template = c.RESULTS_DIR + "rankings_%s_%s_%s_%s.txt"
-    process_count = c.PROCESS_COUNT
+    print("Start evaluating ensembles...")
+    file_template = os.path.join(DIR, "rankings_%s_%s_%s_%s.txt")
+
     # "UnigramLM" can be included manually by uncommenting unigram_configuration lines below
-    aggregation_methods = ["TbTQT", "IDFSum"]  # ,"Bigram","Sum"]
-    _lambda_combinations = [(0.5, 0.5), (0.3, 0.7), (0.7, 0.3)]
+    aggregation_methods = ["TbTQT", "IDFSum"] 
+    _lambda_combinations = [(0.5, 0.5), (0.7, 0.3)]
 
-    pool = Pool(processes=process_count)
     timer = PPrintTimer()
-    all_results = []
-    for year in c.YEARs:
-        for lang_pair in c.LANGUAGE_PAIRS_SHORT:
-            # load relevance assesment files
-            if lang_pair.endswith("it"):
-                relass_file = c.PATH_BASE_EVAL + year + "/qrels_italian_" + year
-            elif lang_pair.endswith("fi"):
-                if int(year) == 2001:
-                    continue  # 2001 campaign does not include finnish
-                relass_file = c.PATH_BASE_EVAL + year + "/qrels_finnish_" + year
-            elif lang_pair.endswith("nl"):
-                relass_file = c.PATH_BASE_EVAL + year + "/qrels_dutch_" + year
-            relevance_assessments = load_relevance_assessments(relass_file)
+    langpair2year2emb_space2model2map = {}
+    for qlang, dlang in LANGUAGE_PAIRS:
+        print(f"{qlang[0]}->{dlang[0]}")
+        year2emb_space2model2map = {}
+        for year in c.YEARS:
+            if year == "2001" and qlang[0] + dlang[0] == "enfi":
+                continue
 
-            # all combinations of vector space induction and aggregation method, e.g.
-            # (Conneau_TbTQT, '/path/to/rankings/produced/by/this/method.txt')
-            unique_configurations = [("%s_%s" % (vectorspace, aggregation_method),
-                                      file_template % (year, lang_pair, vectorspace, aggregation_method))
-                                     for vectorspace in c.METHODs
-                                     for aggregation_method in aggregation_methods]
-            # unigram_configuration = ('None_Unigram-LM', template % (year, lang_pair, 'None', 'Unigram-LM'))
-            # unique_configurations.append(unigram_configuration)
+            relevance_assessments = load_relevance_assessments(language=dlang[0], year=year)
 
-            # run each combination with different weighting schemas, ensemble only methods from same shared vector space
-            tmp_results = []
-            for weight_combination in _lambda_combinations:
-                #
-                tmp_combinations_of_two = [(unique_configurations[0], unique_configurations[1]),
-                                           (unique_configurations[2], unique_configurations[3]),
-                                           (unique_configurations[4], unique_configurations[5])]
-                run = partial(run_ensemble, relass=relevance_assessments, param_model_weights=weight_combination)
-                print("Running %s combinations for %s, %s with weights %s" %
-                      (str(len(tmp_combinations_of_two)), lang_pair, year, weight_combination))
-                tmp_results.extend(pool.map(run, tmp_combinations_of_two))
-
-            # tmp_combinations_of_three = ...
-            # run = partial(run_ensemble, relass=relevance_assessments, param_model_weights=None)
-            # print("running %s combinations for %s, %s" % (str(len(tmp_combinations_of_three)), lang_pair, year))
-            # tmp_results.extend(pool.map(run, tmp_combinations_of_three))
-
-            all_results.extend(
-                ["%s;%s;%s;%s" % (year, lang_pair, method_score[0], method_score[1]) for method_score in tmp_results])
-            best = str(max([tmp_result[1] for tmp_result in tmp_results]))
-            print("Done! (%s) best in this run: %s" % (timer.pprint_lap(), best))
-
-    with open(c.ENSEMBLE_RESULTS_FILE, mode="x") as f:
-        for result in all_results:
-            f.write(result + "\n")
+            emb_space2model2map = {}
+            for clwe in tqdm.tqdm(CLWE):
+                individual_models = [
+                    (model, file_template % (year, qlang[0]+dlang[0], clwe, model))
+                    for model in aggregation_methods
+                ]
+                model2map = {}
+                for weight_combination in _lambda_combinations:
+                    model_1, _ = individual_models[0]
+                    model_2, _ = individual_models[1]
+                    model = f"ensemble_{model_1}={weight_combination[0]}_{model_2}={weight_combination[1]}"
+                    _map = run_ensemble(param_model_weights=weight_combination, method_paths=individual_models, relass=relevance_assessments)
+                    model2map[model] = _map
+                
+                emb_space2model2map[clwe] = model2map
+            
+            year2emb_space2model2map[year] = emb_space2model2map
+        
+        langpair2year2emb_space2model2map[(qlang[0], dlang[0])] = year2emb_space2model2map
+        # print_summary(langpair2year2emb_space2model2map, LANGUAGE_PAIRS, is_pilot=True)
+    
+    rows = print_summary(langpair2year2emb_space2model2map, LANGUAGE_PAIRS, is_pilot=True)
+    
+    with open(os.path.join(DIR, "ensemble_results.csv"), mode="w") as f:
+        f.writelines([l + "\n" for l in rows])
 
     print("Evaluating all ensemble models done! (%s)" % (timer.pprint_stop()))
 
