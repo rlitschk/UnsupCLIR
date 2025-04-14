@@ -11,7 +11,7 @@ The following steps apply for both papers:
 * Set up [clef-dataloaders](https://github.com/rlitschk/clef-dataloaders): `pip install git+https://github.com/rlitschk/clef-dataloaders.git`
 * Download the CLEF 2000-2003 test collection from ELRA ([ELRA-E0008](https://catalogue.elra.info/en-us/repository/browse/ELRA-E0008/))
 
-# Reproduce SIGIR 2018 Results 
+## Reproduce SIGIR 2018 Results 
 In our paper [Unsupervised Cross-Lingual Information Retrieval using Monolingual Data Only](https://arxiv.org/abs/1805.00879), we propose a fully unsupervised framework for ad-hoc cross-lingual information retrieval (CLIR) which requires no bilingual data at all. To reproduce our results, run `scripts/reproduce_sigir18.sh`. This will download cross-lingual word embeddings and run all experiments.
 
 Bibtex:
@@ -25,7 +25,7 @@ Bibtex:
 }
 ```
 
-# Reproduce SIGIR 2019 Results 
+## Reproduce SIGIR 2019 Results 
 
 In our paper [Evaluating Resource-Lean Cross-Lingual Embedding Models in Unsupervised Retrieval](https://dl.acm.org/doi/10.1145/3331184.3331324), we compare different CLWE spaces in CLIR. To reproduce the results, run `scripts/reproduce_sigir19_{clef,europarl}.sh`. 
 
